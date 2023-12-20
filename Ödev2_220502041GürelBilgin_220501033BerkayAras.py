@@ -1,3 +1,5 @@
+import tkinter as tk
+
 class TIR:
     def __init__(self, gelis_zamani, plaka, ulke, ton_20_adet, ton_30_adet, yuk_miktari, maliyet):
         self.gelis_zamani = gelis_zamani
@@ -35,7 +37,6 @@ class Gemi:
     def yuk_yukle(self, yuk_miktari):
         print(
             f"{self.gelis_zamani} zamanında {self.numara} numaralı gemiye {yuk_miktari} tonluk yük yüklendi. Gemi {self.gidecek_ulke} gitmek üzere bekliyor. Anlık yük: {self.kapasite} Harekete geçeceği yük: {self.kapasite + yuk_miktari}")
-        self.kapasite += yuk_miktari
 
 
 class Liman:
@@ -82,18 +83,29 @@ class Liman:
             self.yuk_indir()
             self.yuk_yukle()
             self.kontrol()
-            # İstif alanları doluysa veya gemi bekliyorsa veya vinç işlemi yapılacaksa zamanı ilerlet
             if (len(self.istif_alani_1) >= 750 or len(
                     self.istif_alani_2) >= 750) or not self.gemi_listesi or self.vinc_sayisi < 20:
                 continue
             else:
                 break
 
+# Tkinter arayüz kodu
+def baslat_simulasyon():
+    liman.zaman_gecir()
+    kontrol_label.config(text="Simülasyon başarıyla tamamlandı!")
 
-# Liman oluşturma
+root = tk.Tk()
+root.title("Liman Simülasyonu Arayüzü")
+
+baslat_buton = tk.Button(root, text="Simülasyonu Başlat", command=baslat_simulasyon)
+baslat_buton.pack(pady=20)
+
+kontrol_label = tk.Label(root, text="")
+kontrol_label.pack()
+
+# Liman oluşturma ve olayları okuma kısmı
 liman = Liman()
 
-# Olaylar.csv dosyasını okuma ve TIR nesnelerini oluşturma
 with open('olaylar.csv', 'r', encoding='latin-1') as file:
     lines = file.readlines()
 
@@ -102,7 +114,6 @@ for line in lines[1:]:
     yeni_tir = TIR(int(veri[0]), veri[1], veri[2], int(veri[3]), int(veri[4]), int(veri[5]), int(veri[6]))
     liman.tir_yukle(yeni_tir)
 
-# Gemiler.csv dosyasını okuma ve gemi nesnelerini oluşturma
 with open('gemiler.csv', 'r', encoding='latin-1') as file:
     lines = file.readlines()
 
@@ -111,5 +122,4 @@ for line in lines[1:]:
     yeni_gemi = Gemi(int(veri[0]), veri[1], int(veri[2]), veri[3])
     liman.gemi_yukle(yeni_gemi)
 
-# Simülasyonun çalıştırılması
-liman.zaman_gecir()
+root.mainloop()
